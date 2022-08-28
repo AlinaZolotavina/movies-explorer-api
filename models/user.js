@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const isEmail = require('validator/lib/isEmail');
-const isLength = require('validator/lib/isLength');
 const UnauthorizedError = require('../errors/unauthorized-err');
 
 const userSchema = new mongoose.Schema({
@@ -22,10 +21,8 @@ const userSchema = new mongoose.Schema({
   },
   name: {
     type: String,
-    validate: {
-      validator: (v) => isLength(v, { min: 2, max: 30 }),
-      message: 'Имя должно содержать от 2 до 30 символов',
-    },
+    minlength: 2,
+    maxlength: 30,
   },
 });
 
