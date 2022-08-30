@@ -25,13 +25,6 @@ const validateSignin = celebrate({
   }),
 });
 
-const validateUserId = celebrate({
-  params: Joi.object().keys({
-    _id: Joi.string().required().alphanum().length(24)
-      .hex(),
-  }),
-});
-
 const validateUpdateUserProfile = celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
@@ -65,7 +58,6 @@ const validateDeleteMovie = celebrate({
 module.exports = {
   validateSignup,
   validateSignin,
-  validateUserId,
   validateUpdateUserProfile,
   validateCreateMovie,
   validateDeleteMovie,
