@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const { validateUrl } = require('../utils/validateUrl');
+const isUrl = require('validator/lib/isURL');
+const { IMAGE_BAD_URL_ERROR_MSG, TRAILER_BAD_URL_ERROR_MSG, POSTER_BAD_URL_ERROR_MSG } = require('../utils/constants');
 
 const movieSchema = new mongoose.Schema({
   country: {
@@ -26,24 +27,30 @@ const movieSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: validateUrl,
-      message: 'Некорректная ссылка на изображение',
+      validator(v) {
+        return isUrl(v);
+      },
+      message: IMAGE_BAD_URL_ERROR_MSG,
     },
   },
   trailerLink: {
     type: String,
     required: true,
     validate: {
-      validator: validateUrl,
-      message: 'Некорректная ссылка на трейлер',
+      validator(v) {
+        return isUrl(v);
+      },
+      message: TRAILER_BAD_URL_ERROR_MSG,
     },
   },
   thumbnail: {
     type: String,
     required: true,
     validate: {
-      validator: validateUrl,
-      message: 'Некорректная ссылка на постер к фильму',
+      validator(v) {
+        return isUrl(v);
+      },
+      message: POSTER_BAD_URL_ERROR_MSG,
     },
   },
   owner: {

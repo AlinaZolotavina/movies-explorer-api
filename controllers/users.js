@@ -1,10 +1,20 @@
-const { NODE_ENV, JWT_SECRET } = process.env;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../utils/config');
 const NotFoundError = require('../errors/not-found-err');
 const ConflictError = require('../errors/conflict-err');
 const BadRequestError = require('../errors/bad-request-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
+const {
+  CONFLICT_ERROR_MSG,
+  BAD_REQUEST_ERROR_MSG,
+  SUCCESSFUL_LOGIN_MSG,
+  TOKEN_ERROR_MSG,
+  USER_NOT_FOUND_ERROR_MSG,
+  UNAUTHORIZED_ERROR_MSG,
+  SUCCESSFUL_LOGOUT_MSG,
+  SUCCESSFUL_PROFILE_UPDATE_MSG,
+} = require('../utils/constants');
 const User = require('../models/user');
 
 const createUser = (req, res, next) => {
@@ -24,10 +34,10 @@ const createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'MongoServerError' || err.code === 11000) {
-        return next(new ConflictError('Пользователь с таким e-mail уже существует'));
+        return next(new ConflictError(CONFLICT_ERROR_MSG));
       }
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return next(new BadRequestError('Введенные данные некорректны'));
+        return next(new BadRequestError(BAD_REQUEST_ERROR_MSG));
       }
       return next(err);
     });
@@ -39,7 +49,7 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        JWT_SECRET,
         { expiresIn: '7d' },
       );
       res
@@ -49,7 +59,7 @@ const login = (req, res, next) => {
           // sameSite: 'none',
           // secure: true,
         })
-        .send({ message: 'Вход выполнен' });
+        .send({ message: SUCCESSFUL_LOGIN_MSG });
     })
     .catch(next);
 };
@@ -59,22 +69,22 @@ const logout = (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (!token) {
-    return new UnauthorizedError('Что-то не так с токеном');
+    return new UnauthorizedError(TOKEN_ERROR_MSG);
   }
 
   let verifiedUser;
   return User.findOne({ email })
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
+        return next(new NotFoundError(USER_NOT_FOUND_ERROR_MSG));
       }
-      jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', (err, decoded) => {
+      jwt.verify(token, JWT_SECRET, (err, decoded) => {
         if (err) {
-          return next(new UnauthorizedError('Необходима авторизация'));
+          return next(new UnauthorizedError(UNAUTHORIZED_ERROR_MSG));
         }
         verifiedUser = decoded;
         if (user._id.toHexString() !== verifiedUser._id) {
-          return next(new UnauthorizedError('Необходима авторизация'));
+          return next(new UnauthorizedError(UNAUTHORIZED_ERROR_MSG));
         }
         return res
           .clearCookie('jwt', {
@@ -82,7 +92,7 @@ const logout = (req, res, next) => {
             sameSite: 'none',
             secure: true,
           })
-          .send({ message: 'Вы вышли' });
+          .send({ message: SUCCESSFUL_LOGOUT_MSG });
       });
       return true;
     })
@@ -93,7 +103,7 @@ const getMe = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
+        return next(new NotFoundError(USER_NOT_FOUND_ERROR_MSG));
       }
       return res.send(user);
     })
@@ -106,9 +116,9 @@ const updateUserProfile = (req, res, next) => {
   User.findByIdAndUpdate(userId, { name, email }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
+        return next(new NotFoundError(USER_NOT_FOUND_ERROR_MSG));
       }
-      return res.status(200).send({ user, message: 'Профиль обновлен' });
+      return res.status(200).send({ user, message: SUCCESSFUL_PROFILE_UPDATE_MSG });
     })
     .catch(next);
 };

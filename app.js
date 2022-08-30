@@ -3,14 +3,23 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const { celebrate, errors, Joi } = require('celebrate');
+const { errors } = require('celebrate');
+const helmet = require('helmet');
+const cors = require('cors');
+const corsOptions = require('./utils/corsOptions');
 const router = require('./routes');
 const { login, logout, createUser } = require('./controllers/users');
 const errorHandler = require('./middlewares/errorHandler');
 const NotFoundError = require('./errors/not-found-err');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { validateSignup, validateSignin } = require('./middlewares/validateRequests');
+const { NOT_FOUND_ERROR_MSG } = require('./utils/constants');
+const rateLimiter = require('./middlewares/rateLimiter');
 
-const { PORT = 3000 } = process.env;
+const {
+  PORT,
+  DB_URL,
+} = require('./utils/config');
 
 const app = express();
 
@@ -19,33 +28,28 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
+mongoose.connect(DB_URL, {
   useNewUrlParser: true,
 });
 
+app.use(cors(corsOptions));
+
 app.use(requestLogger);
 
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-    name: Joi.string().min(2).max(30),
-  }),
-}), createUser);
+app.use(helmet());
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-  }),
-}), login);
+app.use(rateLimiter);
+
+app.post('/signup', validateSignup, createUser);
+
+app.post('/signin', validateSignin, login);
 
 app.post('/signout', logout);
 
 app.use(router);
 
-app.use('*', (req, res) => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден');
+app.use('*', () => {
+  throw new NotFoundError(NOT_FOUND_ERROR_MSG);
 });
 
 app.use(errorLogger);
@@ -54,7 +58,4 @@ app.use(errors());
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Сервер слушает порт ${PORT}`);
-});
+app.listen(PORT);
