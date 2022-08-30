@@ -27,7 +27,7 @@ app.use(requestLogger);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    mail: Joi.string().email().required(),
+    email: Joi.string().email().required(),
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
   }),
