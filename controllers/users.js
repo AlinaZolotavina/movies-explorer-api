@@ -6,7 +6,7 @@ const ConflictError = require('../errors/conflict-err');
 const BadRequestError = require('../errors/bad-request-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
 const {
-  CONFLICT_ERROR_MSG,
+  CONFLICT_SIGNUP_EMAIL_ERROR_MSG,
   BAD_REQUEST_ERROR_MSG,
   SUCCESSFUL_LOGIN_MSG,
   TOKEN_ERROR_MSG,
@@ -14,6 +14,7 @@ const {
   UNAUTHORIZED_ERROR_MSG,
   SUCCESSFUL_LOGOUT_MSG,
   SUCCESSFUL_PROFILE_UPDATE_MSG,
+  CONFLICT_UPDATE_EMAIL_ERROR_MSG,
 } = require('../utils/constants');
 const User = require('../models/user');
 
@@ -34,7 +35,7 @@ const createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'MongoServerError' || err.code === 11000) {
-        return next(new ConflictError(CONFLICT_ERROR_MSG));
+        return next(new ConflictError(CONFLICT_SIGNUP_EMAIL_ERROR_MSG));
       }
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         return next(new BadRequestError(BAD_REQUEST_ERROR_MSG));
@@ -120,7 +121,15 @@ const updateUserProfile = (req, res, next) => {
       }
       return res.status(200).send({ user, message: SUCCESSFUL_PROFILE_UPDATE_MSG });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'MongoServerError' || err.code === 11000) {
+        return next(new ConflictError(CONFLICT_UPDATE_EMAIL_ERROR_MSG));
+      }
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        return next(new BadRequestError(BAD_REQUEST_ERROR_MSG));
+      }
+      return next(err);
+    });
 };
 
 module.exports = {

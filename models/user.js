@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    dropDups: true,
     validate: {
       validator: (v) => isEmail(v),
       message: BAD_EMAIL_ERROR_MSG,
@@ -24,6 +23,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     minlength: 2,
     maxlength: 30,
+    required: true,
   },
 });
 

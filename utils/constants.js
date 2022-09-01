@@ -11,8 +11,9 @@ const BAD_EMAIL_ERROR_MSG = 'Invalid e-mail';
 const UNAUTHORIZED_ERROR_MSG = 'Authorization required';
 const WRONG_EMAIL_OR_PASSWORD_ERROR_MSG = 'Wrong e-mail or password';
 const TOKEN_ERROR_MSG = 'Token error';
-const CONFLICT_ERROR_MSG = 'User with this e-mail already exists';
+const CONFLICT_SIGNUP_EMAIL_ERROR_MSG = 'User with this e-mail already exists';
 const FORBIDDEN_ERROR_MSG = 'You are not allowed to delete this movie';
+const CONFLICT_UPDATE_EMAIL_ERROR_MSG = 'The email you entered is already in use';
 
 const SUCCESSFUL_LOGIN_MSG = 'You have successfully logged in';
 const SUCCESSFUL_LOGOUT_MSG = 'You successfully logged out';
@@ -33,10 +34,11 @@ module.exports = {
   UNAUTHORIZED_ERROR_MSG,
   WRONG_EMAIL_OR_PASSWORD_ERROR_MSG,
   TOKEN_ERROR_MSG,
-  CONFLICT_ERROR_MSG,
+  CONFLICT_SIGNUP_EMAIL_ERROR_MSG,
   FORBIDDEN_ERROR_MSG,
   SUCCESSFUL_LOGIN_MSG,
   SUCCESSFUL_LOGOUT_MSG,
   SUCCESSFUL_PROFILE_UPDATE_MSG,
   SUCCESSFUL_MOVIE_DELETE_MSG,
+  CONFLICT_UPDATE_EMAIL_ERROR_MSG,
 };

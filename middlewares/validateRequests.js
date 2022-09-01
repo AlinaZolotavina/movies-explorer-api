@@ -14,7 +14,7 @@ const validateSignup = celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().min(2).max(30).required(),
   }),
 });
 
@@ -28,23 +28,23 @@ const validateSignin = celebrate({
 const validateUpdateUserProfile = celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().min(2).max(30).required(),
   }),
 });
 
 const validateCreateMovie = celebrate({
   body: Joi.object().keys({
-    country: Joi.string().required().min(1).max(50),
-    director: Joi.string().required().min(2).max(50),
-    duration: Joi.number().required(),
-    year: Joi.string().required().min(4).max(4),
-    description: Joi.string().required().min(10).max(1000),
+    country: Joi.string().required(),
+    director: Joi.string().required(),
+    duration: Joi.number().required().integer(),
+    year: Joi.string().required(),
+    description: Joi.string().required(),
     image: Joi.string().required().custom(validateUrl),
     trailerLink: Joi.string().required().custom(validateUrl),
     thumbnail: Joi.string().required().custom(validateUrl),
-    movieId: Joi.number().required(),
-    nameRU: Joi.string().required().min(1).max(50),
-    nameEN: Joi.string().required().min(1).max(50),
+    movieId: Joi.number().required().integer(),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required(),
   }),
 });
 
