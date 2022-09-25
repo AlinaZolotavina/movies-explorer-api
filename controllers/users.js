@@ -60,7 +60,14 @@ const login = (req, res, next) => {
           sameSite: 'none',
           secure: true,
         })
-        .send({ message: SUCCESSFUL_LOGIN_MSG });
+        .send({
+          user: {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+          },
+          message: SUCCESSFUL_LOGIN_MSG,
+        });
     })
     .catch(next);
 };
