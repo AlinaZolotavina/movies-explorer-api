@@ -13,7 +13,7 @@ const getMovies = (req, res, next) => {
 const createMovie = (req, res, next) => {
   const owner = req.user._id;
   Movie.create({ owner, ...req.body })
-    .then((movie) => res.status(201).send({ movie }))
+    .then((movie) => res.status(201).send(movie))
     .catch(next);
 };
 
